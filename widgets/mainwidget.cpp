@@ -94,8 +94,6 @@ void MainWidget::FillUI()
     m_tabWidget->addTab(m_checkerWidget, "Проверка тайлов в папке");
     m_pathLabel->setText("Путь: " + QApplication::applicationDirPath());
     m_setPathButton->setText("Выбрать путь");
-    m_loaderWidget->SetFolderToSave(QApplication::applicationDirPath());
-    m_checkerWidget->SetPath(QApplication::applicationDirPath());
 }
 
 void MainWidget::LoadDataFromSettings()
@@ -125,7 +123,7 @@ void MainWidget::ConnectObjects()
 
 void MainWidget::OnSetPathButton()
 {
-    const QString folderPath = QFileDialog::getExistingDirectory(0, ("Рабочая папка"), QDir::currentPath());
+    const QString folderPath = QFileDialog::getExistingDirectory(0, ("Рабочая папка"), QDir::currentPath())+'/';
     m_pathLabel->setText("Путь: " + folderPath);
     m_loaderWidget->SetFolderToSave(folderPath);
     m_checkerWidget->SetPath(folderPath);

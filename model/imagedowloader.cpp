@@ -122,7 +122,7 @@ void ImageDownloader::ConnectReply()
 {
     connect(m_reply, &QNetworkReply::readyRead, this, &ImageDownloader::OnImageRead);
     connect(m_reply, &QNetworkReply::finished, this, &ImageDownloader::OnFinishedImageLoad);
-    connect(m_reply, &QNetworkReply::error, m_reply, &QObject::deleteLater);
+    connect(m_reply, &QNetworkReply::errorOccurred, m_reply, &QObject::deleteLater);
     connect(m_reply, &QNetworkReply::finished, m_reply, &QObject::deleteLater);
 }
 

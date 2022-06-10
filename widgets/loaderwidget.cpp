@@ -145,7 +145,7 @@ void LoaderWidget::OnSetTocken(const QString &osmTocken)
 
 void LoaderWidget::SetFolderToSave(const QString &path) noexcept
 {
-    m_folderToSavePath = path + '/';
+    m_folderToSavePath = path;
 }
 
 void LoaderWidget::SetProgressBars(int latitudeTop, int latitudeBottom)

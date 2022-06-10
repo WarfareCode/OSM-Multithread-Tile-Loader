@@ -1,7 +1,7 @@
 QT -= svg
 QT += core gui network widgets
 CONFIG += c++11
-VERSION = 3.1
+VERSION = 3.2
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
 #message("Дата сборки= $$BUILD_DATE")

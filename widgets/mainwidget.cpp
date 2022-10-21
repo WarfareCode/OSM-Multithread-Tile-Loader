@@ -12,26 +12,6 @@ MainWidget::MainWidget(QWidget *parent)
     LoadDataFromSettings();
 }
 
-MainWidget::~MainWidget()
-{
-    delete m_osmValidator;
-
-    delete m_topLayout;
-    delete m_pathLayout;
-    delete m_mainLayout;
-
-    delete m_treadCountComboBox;
-    delete m_layerLabel;
-    delete m_layerComboBox;
-    delete m_osmLabel;
-    delete m_osmTockenLineEdit;
-    delete m_pathLabel;
-    delete m_setPathButton;
-    delete m_checkerWidget;
-    delete m_loaderWidget;
-    delete m_tabWidget;
-}
-
 void MainWidget::InitUI()
 {
     m_osmValidator = new QIntValidator(this);
@@ -77,7 +57,7 @@ void MainWidget::FillUI()
     QString qtVersion = QString::fromLatin1(qVersion());
     setWindowTitle( "Качальщик карт Qt " + qtVersion + " Версия: " + APP_VERSION + " от " + BUILD_DATE);
     m_osmTockenLineEdit->setValidator(m_osmValidator);
-    m_threadLabel->setText(QStringLiteral("КОЛЛИЧЕСТВО ПОТОКОВ: "));
+    m_threadLabel->setText("КОЛЛИЧЕСТВО ПОТОКОВ: ");
     m_layerLabel->setText("СЛОЙ: ");
     m_osmLabel->setText("ТОКЕН ОСМ");
     for (int i = 1; i < 12; ++i)
@@ -90,15 +70,18 @@ void MainWidget::FillUI()
     }
     m_treadCountComboBox->setEditable(false);
     m_layerComboBox->setEditable(false);
+    m_tabWidget->tabBar()->setExpanding(true);
     m_tabWidget->addTab(m_loaderWidget, "Загрузка тайлов");
     m_tabWidget->addTab(m_checkerWidget, "Проверка тайлов в папке");
     m_pathLabel->setText("Путь: " + QApplication::applicationDirPath());
     m_setPathButton->setText("Выбрать путь");
+    m_loaderWidget->SetFolderToSave(QApplication::applicationDirPath());
+    m_checkerWidget->SetPath(QApplication::applicationDirPath());
 }
 
 void MainWidget::LoadDataFromSettings()
 {
-    const QSettings settings(QStringLiteral("mapLoaderNrls"));
+    const QSettings settings("mapLoaderNrls");
     const int threadCounts = settings.value(threadKey, 1).toInt();
     const int layer = settings.value(layerKey, "1").toInt();
     const QString osmTocken = settings.value(osmTockenKey, "000000").toString();
@@ -114,16 +97,16 @@ void MainWidget::LoadDataFromSettings()
 void MainWidget::ConnectObjects()
 {
     connect(m_setPathButton, &QPushButton::clicked, this, &MainWidget::OnSetPathButton);
-    connect(m_treadCountComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), m_loaderWidget, &LoaderWidget::OnChangeThreadCount);
-    connect(m_layerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), m_loaderWidget, &LoaderWidget::OnChangeLayer);
+    connect(m_treadCountComboBox, qOverload<int>(&QComboBox::currentIndexChanged), m_loaderWidget, &LoaderWidget::OnChangeThreadCount);
+    connect(m_layerComboBox, qOverload<int>(&QComboBox::currentIndexChanged), m_loaderWidget, &LoaderWidget::OnChangeLayer);
     connect(m_osmTockenLineEdit, &QLineEdit::textChanged, m_loaderWidget, &LoaderWidget::OnSetTocken);
-    connect(m_layerComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), m_checkerWidget, &CheckerWidget::OnChangeLayer);
+    connect(m_layerComboBox, qOverload<int>(&QComboBox::currentIndexChanged), m_checkerWidget, &CheckerWidget::OnChangeLayer);
     connect(m_osmTockenLineEdit, &QLineEdit::textChanged, m_checkerWidget, &CheckerWidget::OnSetTocken);
 }
 
 void MainWidget::OnSetPathButton()
 {
-    const QString folderPath = QFileDialog::getExistingDirectory(0, ("Рабочая папка"), QDir::currentPath())+'/';
+    const QString folderPath = QFileDialog::getExistingDirectory(0, ("Рабочая папка"), QDir::currentPath());
     m_pathLabel->setText("Путь: " + folderPath);
     m_loaderWidget->SetFolderToSave(folderPath);
     m_checkerWidget->SetPath(folderPath);

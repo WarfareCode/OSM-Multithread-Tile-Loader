@@ -22,19 +22,19 @@ private:
     void FillUI();
     void SetDataFromSettings();
 public:
-    bool UserWantList() const noexcept;
+    bool IsListLoading() const noexcept;
     int GetStartLong() const noexcept;
     QString GetLongList() const noexcept;
 private:
     QVBoxLayout *m_mainLayout;
 
     QHBoxLayout *m_firstLayout;
-    QRadioButton *m_toInfLongitudeRadio;
-    QSpinBox *m_startValue;
+    QRadioButton *m_beginLongRadio;
+    QSpinBox *m_beginLongValue;
 
     QHBoxLayout *m_secondLayout;
-    QRadioButton *m_fromListLongRadio;
-    QLineEdit *m_longsFromList;
+    QRadioButton *m_longListRadio;
+    QLineEdit *m_longListEdit;
 };
 
 #endif // LONGTITUDEWIDGET_H

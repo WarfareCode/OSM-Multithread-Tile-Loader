@@ -45,7 +45,8 @@ void LoaderWidget::InitUI()
 
 void LoaderWidget::InsertWidgetIntoLayouts()
 {
-    m_formLayout->addRow("Широта(снизу наверх) нижняя", m_latitudeBottomLineEdit);
+    m_formLayout->addRow("Широта нижняя", m_latitudeBottomLineEdit);
+    m_latitudeBottomLineEdit->setToolTip("Широта снизу наверх, нижнее поле больше верхнего см карту");
     m_formLayout->addRow("Широта верхняя", m_latitudeTopLineEdit);
     m_mainLayout->addLayout(m_formLayout);
     m_mainLayout->addWidget(m_longtitudeWidget);
@@ -88,9 +89,10 @@ void LoaderWidget::OnStart()
     const int latitudeBottom = latitudeBottomText.toInt();
     const QString latitudeTopText = m_latitudeTopLineEdit->text();
     const int latitudeTop = latitudeTopText.toInt();
-    if (m_longtitudeWidget->UserWantList())
+    if (m_longtitudeWidget->IsListLoading())
     {
-        m_repository->SetLongtitudesList(m_longtitudeWidget->GetLongList());
+        const QString textedList = m_longtitudeWidget->GetLongList();
+        m_repository->SetLongtitudesList(textedList);
     }
     else
     {
@@ -145,19 +147,21 @@ void LoaderWidget::OnSetTocken(const QString &osmTocken)
 
 void LoaderWidget::SetFolderToSave(const QString &path) noexcept
 {
-    m_folderToSavePath = path;
+    m_folderToSavePath = path + '/';
 }
 
 void LoaderWidget::SetProgressBars(int latitudeTop, int latitudeBottom)
 {
-    for (int i = 0; i < m_barsLayout->count(); ++i)
+    for (int i = m_barsLayout->count() - 1; i >= 0 ; --i)
     {
-        delete m_barsLayout->itemAt(0)->widget();
+        QLayoutItem *const item = m_barsLayout->itemAt(0);
+        m_barsLayout->removeItem(item);
+        item->widget()->deleteLater();
     }
 
     for (int i = 0; i < m_threadCount; ++i)
     {
-        QProgressBar *const progressBar = new QProgressBar(this);
+        QProgressBar *const progressBar = new QProgressBar();
         progressBar->setToolTip(QString::number(i) + " поток");
         progressBar->setRange(latitudeTop, latitudeBottom);
         m_barsLayout->addWidget(progressBar);
@@ -172,16 +176,14 @@ void LoaderWidget::StartLoader(int latitudeTop, int latitudeBottom)
 
     for (int i = 0; i < m_threadCount; ++i)
     {
-        QThread *const thread = new QThread(Q_NULLPTR);
+        QThread *const thread = new QThread();
         ImageDownloader *const loader = new ImageDownloader(m_folderToSavePath, m_osmTocken, QString::number(m_layer), latitudeBottom, latitudeTop, m_repository, Q_NULLPTR);
         loader->moveToThread(thread);
         loader->setObjectName(QString::number(i));
         connect(thread, &QThread::started, loader, &ImageDownloader::OnMakeQueue);
         connect(loader, &ImageDownloader::ToFinishThread, thread, &QThread::quit);
-        connect(loader, &ImageDownloader::ToUpdateProgressBar, this,
-                &LoaderWidget::OnProgressBarUpdate);
-        connect(loader, &ImageDownloader::ToResetBar, this,
-                &LoaderWidget::OnProgressBarReset);
+        connect(loader, &ImageDownloader::ToUpdateProgressBar, this, &LoaderWidget::OnProgressBarUpdate);
+        connect(loader, &ImageDownloader::ToResetBar, this, &LoaderWidget::OnProgressBarReset);
         connect(loader, &ImageDownloader::ToFinishThread, loader, &ImageDownloader::deleteLater);
         connect(thread, &QThread::finished, thread, &QThread::deleteLater);
         threadList.insert(thread, loader);

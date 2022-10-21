@@ -12,8 +12,7 @@ class MainWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MainWidget(QWidget *parent);
-    ~MainWidget();
+    explicit MainWidget(QWidget *parent=nullptr);
 private:
     void InitUI();
     void InsertWidgetIntoLayouts();

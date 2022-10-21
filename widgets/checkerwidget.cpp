@@ -20,9 +20,9 @@ CheckerWidget::~CheckerWidget()
     delete m_mainLayout;
 
 
-    delete m_toFileCheking;
-    delete m_fromToChecking;
-    delete m_fileExsistsChecking;
+    delete m_byFileFomatChecking;
+    delete m_byIndexFormatChecking;
+    delete m_byIndexExsistsChecking;
 
     delete m_fromLabel;
     delete m_fromSpinBox;
@@ -42,9 +42,9 @@ void CheckerWidget::CreateObjects()
 void CheckerWidget::InitUI()
 {
     m_mainLayout = new QVBoxLayout();
-    m_toFileCheking = new QRadioButton();
-    m_fromToChecking = new QRadioButton();
-    m_fileExsistsChecking = new QRadioButton();
+    m_byFileFomatChecking = new QRadioButton();
+    m_byIndexFormatChecking = new QRadioButton();
+    m_byIndexExsistsChecking = new QRadioButton();
 
     m_bar = new QProgressBar();
     m_startChecking = new QPushButton();
@@ -58,9 +58,9 @@ void CheckerWidget::InitUI()
 
 void CheckerWidget::InsertWidgetIntoLayouts()
 {
-    m_mainLayout->addWidget(m_toFileCheking);
-    m_mainLayout->addWidget(m_fromToChecking);
-    m_mainLayout->addWidget(m_fileExsistsChecking);
+    m_mainLayout->addWidget(m_byFileFomatChecking);
+    m_mainLayout->addWidget(m_byIndexFormatChecking);
+    m_mainLayout->addWidget(m_byIndexExsistsChecking);
 
     m_bottomLayout->addWidget(m_fromLabel);
     m_bottomLayout->addWidget(m_fromSpinBox);
@@ -75,12 +75,15 @@ void CheckerWidget::InsertWidgetIntoLayouts()
 
 void CheckerWidget::FillUI()
 {
+
+    m_byFileFomatChecking->setText("Проверка во всех папках всех картинок на валидность (медленно)");
+    m_byIndexFormatChecking->setText("Проверка во всех папках картинок по индексу на валидность (оч медленно)");
+    m_byIndexExsistsChecking->setText("Проверка во всех папках картинок по индeксу на наличие файла (быстро)");
+    m_byIndexExsistsChecking->setChecked(true);
+
     m_fromLabel->setText("Индексы (в порядке возрастания) с ");
     m_toLabel->setText(" до ");
-    m_toFileCheking->setText("Проверка все картинок в папке на валидность");
-    m_fromToChecking->setText("Проверка во всех папках картинок по индексу, на валидность");
-    m_fileExsistsChecking->setText("Проверка картинок по индуксу на наличие файла");
-    m_fromToChecking->setChecked(true);
+
     m_startChecking->setText("Начать проверку");
     m_fromSpinBox->setMaximum(99999999);
     m_toSpinBox->setMaximum(99999999);
@@ -89,13 +92,13 @@ void CheckerWidget::FillUI()
 void CheckerWidget::ConnectObjects()
 {
     connect(m_startChecking, &QPushButton::clicked, this, &CheckerWidget::OnStartChecking);
-    connect(m_fromToChecking, &QRadioButton::toggled, this, &CheckerWidget::OnSetSecondChecking);
+    connect(m_byFileFomatChecking, &QRadioButton::toggled, this, &CheckerWidget::OnSetSecondChecking);
     connect(m_checker, &ImageChecker::ToUpdateProgressBar, this, &CheckerWidget::OnUpdateProgressBar);
 }
 
 void CheckerWidget::OnStartChecking()
 {
-    if (m_toFileCheking->isChecked())
+    if (m_byFileFomatChecking->isChecked())
     {
         PrepareForChecking();
         const QStringList brokenList = m_checker->StartCheckAllFiles();
@@ -110,7 +113,8 @@ void CheckerWidget::OnStartChecking()
         if (fromIndex < toIndex)
         {
             PrepareForChecking();
-            const QStringList brokenList = m_checker->StartCheckByIndex(fromIndex, toIndex);
+            const bool isNeedToCheckFormat=m_byIndexFormatChecking->isChecked();
+            const QStringList brokenList = m_checker->StartCheckByIndex(fromIndex, toIndex, isNeedToCheckFormat);
             PrepareForLoading(brokenList.count());
             m_checker->LoadImages(m_layer, m_osmTocken, brokenList);
             QMessageBox::information(this, "Готово", "Готово");
@@ -125,8 +129,8 @@ void CheckerWidget::OnStartChecking()
 
 void CheckerWidget::OnSetSecondChecking(bool state)
 {
-    m_fromSpinBox->setEnabled(state);
-    m_toSpinBox->setEnabled(state);
+    m_fromSpinBox->setDisabled(state);
+    m_toSpinBox->setDisabled(state);
 }
 
 void CheckerWidget::OnUpdateProgressBar()

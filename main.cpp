@@ -4,9 +4,9 @@
 int main(int argc, char *argv[])
 {
     //http://tools.geofabrik.de/
-    QApplication a(argc, argv);
-    MainWidget widget(Q_NULLPTR);
+    QApplication app(argc, argv);
+    MainWidget widget;
     widget.show();
-    return a.exec();
+    return app.exec();
 }
 

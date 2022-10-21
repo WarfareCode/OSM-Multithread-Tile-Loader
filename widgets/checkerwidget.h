@@ -48,9 +48,9 @@ private:
 private:
     QVBoxLayout *m_mainLayout;
 
-    QRadioButton *m_toFileCheking;
-    QRadioButton *m_fromToChecking;
-    QRadioButton *m_fileExsistsChecking;
+    QRadioButton *m_byFileFomatChecking;
+    QRadioButton *m_byIndexFormatChecking;
+    QRadioButton *m_byIndexExsistsChecking;
 
     QHBoxLayout *m_bottomLayout;
     QLabel *m_fromLabel;

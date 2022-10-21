@@ -1,6 +1,5 @@
-QT -= svg
-QT += core gui network widgets
-CONFIG += c++11
+QT += network widgets
+CONFIG += c++14
 VERSION = 3.2
 DEFINES += APP_VERSION=\\\"$$VERSION\\\"
 
@@ -32,11 +31,6 @@ SOURCES += \
         widgets/mainwidget.cpp \
         model/logtitudesrepository.cpp \
         widgets/longtitudewidget.cpp
-
-# Default rules for deployment.
-qnx: target.path = /tmp/$${TARGET}/bin
-else: unix:!android: target.path = /opt/$${TARGET}/bin
-!isEmpty(target.path): INSTALLS += target
 
 DISTFILES += \
     astyle.astylerc

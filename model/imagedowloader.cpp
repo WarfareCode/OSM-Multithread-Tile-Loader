@@ -63,6 +63,7 @@ void ImageDownloader::OnFinishedImageLoad()
     {
         m_file.close();
         m_tilesList.pop_front();
+        delete m_reply;
         if (m_tilesList.empty())
         {
             qDebug() << "FULL Loaded  " << m_currentLongtitude;
@@ -122,8 +123,6 @@ void ImageDownloader::ConnectReply()
 {
     connect(m_reply, &QNetworkReply::readyRead, this, &ImageDownloader::OnImageRead);
     connect(m_reply, &QNetworkReply::finished, this, &ImageDownloader::OnFinishedImageLoad);
-    connect(m_reply, &QNetworkReply::errorOccurred, m_reply, &QObject::deleteLater);
-    connect(m_reply, &QNetworkReply::finished, m_reply, &QObject::deleteLater);
 }
 
 void ImageDownloader::Next()

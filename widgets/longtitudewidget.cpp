@@ -17,10 +17,10 @@ LongtitudeWidget::~LongtitudeWidget()
     delete m_firstLayout;
     delete m_mainLayout;
 
-    delete m_toInfLongitudeRadio;
-    delete m_startValue;
-    delete m_fromListLongRadio;
-    delete m_longsFromList;
+    delete m_beginLongRadio;
+    delete m_beginLongValue;
+    delete m_longListRadio;
+    delete m_longListEdit;
 }
 
 void LongtitudeWidget::InitUI()
@@ -28,21 +28,21 @@ void LongtitudeWidget::InitUI()
     m_mainLayout = new QVBoxLayout();
 
     m_firstLayout = new QHBoxLayout();
-    m_toInfLongitudeRadio = new QRadioButton();
-    m_startValue = new QSpinBox();
+    m_beginLongRadio = new QRadioButton();
+    m_beginLongValue = new QSpinBox();
 
     m_secondLayout = new QHBoxLayout();
-    m_fromListLongRadio = new QRadioButton();
-    m_longsFromList = new QLineEdit();
+    m_longListRadio = new QRadioButton();
+    m_longListEdit = new QLineEdit();
 }
 
 void LongtitudeWidget::InsertWidgetIntoLayouts()
 {
-    m_firstLayout->addWidget(m_toInfLongitudeRadio);
-    m_firstLayout->addWidget(m_startValue);
+    m_firstLayout->addWidget(m_beginLongRadio);
+    m_firstLayout->addWidget(m_beginLongValue);
 
-    m_secondLayout->addWidget(m_fromListLongRadio);
-    m_secondLayout->addWidget(m_longsFromList);
+    m_secondLayout->addWidget(m_longListRadio);
+    m_secondLayout->addWidget(m_longListEdit);
 
     m_mainLayout->addLayout(m_firstLayout);
     m_mainLayout->addLayout(m_secondLayout);
@@ -51,29 +51,31 @@ void LongtitudeWidget::InsertWidgetIntoLayouts()
 
 void LongtitudeWidget::FillUI()
 {
-    m_toInfLongitudeRadio->setText(QStringLiteral("Начиная с долготы: "));
-    m_fromListLongRadio->setText("Список долгот через зяпятую: ");
-    m_startValue->setMaximum(99999999);
+    m_beginLongRadio->setChecked(true);
+    m_beginLongRadio->setText(QStringLiteral("Начиная с долготы: "));
+    m_longListRadio->setText("Список долгот: ");
+    m_longListRadio->setToolTip("Через запятую или тире например: 2,3,5-9 , 11, 44-77");
+    m_beginLongValue->setMaximum(99999999);
 }
 
 void LongtitudeWidget::SetDataFromSettings()
 {
     const QSettings settings(QStringLiteral("mapLoaderNrls"));
     const int longtitude = settings.value(longKey, "10").toInt();
-    m_startValue->setValue(longtitude);
+    m_beginLongValue->setValue(longtitude);
 }
 
-bool LongtitudeWidget::UserWantList() const noexcept
+bool LongtitudeWidget::IsListLoading() const noexcept
 {
-    return m_fromListLongRadio->isChecked();
+    return m_longListRadio->isChecked();
 }
 
 int LongtitudeWidget::GetStartLong() const noexcept
 {
-    return m_startValue->value();
+    return m_beginLongValue->value();
 }
 
 QString LongtitudeWidget::GetLongList() const noexcept
 {
-    return m_longsFromList->text();
+    return m_longListEdit->text();
 }
